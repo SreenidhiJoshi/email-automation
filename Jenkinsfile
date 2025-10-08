@@ -17,7 +17,7 @@ pipeline {
             steps {
                 script {
                     echo "Building Docker image..."
-                    sh 'docker build -t ${IMAGE_NAME} .'
+                    bat "docker build -t %IMAGE_NAME% ."
                 }
             }
         }
@@ -30,11 +30,11 @@ pipeline {
             steps {
                 script {
                     echo "Running container with secure environment variables..."
-                    sh """
-                        docker run -d --name emailapp_local -p 5000:5000 \
-                        -e EMAIL_ADDRESS=${EMAIL_ADDRESS} \
-                        -e APP_PASSWORD=${APP_PASSWORD} \
-                        ${IMAGE_NAME}
+                    bat """
+                        docker run -d --name emailapp_local -p 5000:5000 ^
+                        -e EMAIL_ADDRESS=%EMAIL_ADDRESS% ^
+                        -e APP_PASSWORD=%APP_PASSWORD% ^
+                        %IMAGE_NAME%
                     """
                 }
             }
@@ -43,7 +43,7 @@ pipeline {
         stage('Test App') {
             steps {
                 echo "Checking if container is running..."
-                sh 'docker ps'
+                bat 'docker ps'
             }
         }
     }
@@ -51,8 +51,9 @@ pipeline {
     post {
         always {
             echo "Cleaning up old containers..."
-            sh 'docker stop emailapp_local || true'
-            sh 'docker rm emailapp_local || true'
+            bat 'docker stop emailapp_local || exit 0'
+            bat 'docker rm emailapp_local || exit 0'
         }
     }
 }
+
