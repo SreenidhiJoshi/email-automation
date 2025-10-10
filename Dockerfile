@@ -14,4 +14,5 @@ COPY . .
 EXPOSE 5000
 
 # default command runs the flask app (so CI can hit endpoints)
-CMD ["python", "flask_app.py"]
+CMD ["python", "email_automation.py"]
+
