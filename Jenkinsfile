@@ -23,19 +23,20 @@ pipeline {
         }
 
         stage('Run Docker Container') {
-            environment {
-                EMAIL_ADDRESS = credentials('gmail_email')
-                APP_PASSWORD = credentials('gmail_app_password')
-            }
             steps {
-                script {
-                    echo "Running container with secure environment variables..."
-                    bat """
-                        docker run -d --name emailapp_local -p 5000:5000 ^
-                        -e EMAIL_ADDRESS=%EMAIL_ADDRESS% ^
-                        -e APP_PASSWORD=%APP_PASSWORD% ^
-                        %IMAGE_NAME%
-                    """
+                withCredentials([
+                    string(credentialsId: 'gmail_email', variable: 'EMAIL_ADDRESS'),
+                    string(credentialsId: 'gmail_app_password', variable: 'APP_PASSWORD')
+                ]) {
+                    script {
+                        echo "Running container with secure environment variables..."
+                        bat """
+                            docker run -d --name emailapp_local -p 5000:5000 ^
+                            -e EMAIL_ADDRESS=%EMAIL_ADDRESS% ^
+                            -e APP_PASSWORD=%APP_PASSWORD% ^
+                            %IMAGE_NAME%
+                        """
+                    }
                 }
             }
         }
@@ -56,4 +57,3 @@ pipeline {
         }
     }
 }
-
